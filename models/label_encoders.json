@@ -1,0 +1,14 @@
+{
+  "classes": [
+    "agricultural_burn",
+    "industrial",
+    "wildfire"
+  ],
+  "feature_columns": [
+    "frp",
+    "brightness",
+    "acq_time",
+    "frp_mean",
+    "frp_std"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "n": 5000,
+  "positive": 1216,
+  "negative": 2676,
+  "abstain": 1108,
+  "dnbr_threshold": 0.1,
+  "abstain_producer_type": 419,
+  "abstain_no_post_imagery": 26,
+  "abstain_pixel_masked": 521,
+  "abstain_no_pre_imagery": 142,
+  "dnbr_measured": 3921
+}

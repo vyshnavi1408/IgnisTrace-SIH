@@ -1,0 +1,37 @@
+{
+  "radius_m": 1000,
+  "rule_input_columns": [
+    "persistence_count",
+    "historical_n_detections"
+  ],
+  "model_safe_columns": [
+    "bbox_area_km2",
+    "bdiff_max",
+    "bdiff_mean",
+    "bdiff_std",
+    "brightness_mean",
+    "brightness_std",
+    "bt31_mean",
+    "bt31_std",
+    "centroid_jitter_m",
+    "cluster_night_fraction",
+    "confidence_mean",
+    "duration_h",
+    "frp_cv",
+    "frp_max",
+    "frp_mean",
+    "frp_slope_per_day",
+    "frp_std",
+    "gap_median_days",
+    "gap_std_days",
+    "historical_has_prev",
+    "historical_span_days",
+    "max_det_per_day",
+    "n_det_z",
+    "n_distinct_days",
+    "n_satellites",
+    "rise_to_peak_h",
+    "same_day_earlier_dets",
+    "span_days"
+  ]
+}
