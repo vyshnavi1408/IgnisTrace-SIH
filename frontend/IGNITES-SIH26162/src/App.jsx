@@ -216,7 +216,153 @@ const detections = [
     dnbr: 0.02,
   },
 ];
+const persistenceHistory = {
+  "TH-001": [
+    { date: "Sep 08", frp: 24.1 },
+    { date: "Sep 11", frp: 26.8 },
+    { date: "Sep 13", frp: 27.5 },
+    { date: "Sep 15", frp: 28.4 },
+  ],
+  "TH-002": [
+    { date: "Sep 12", frp: 12.1 },
+    { date: "Sep 15", frp: 14.7 },
+  ],
+  "TH-003": [
+    { date: "Sep 10", frp: 15.4 },
+    { date: "Sep 13", frp: 18.1 },
+    { date: "Sep 15", frp: 19.2 },
+  ],
+  "TH-004": [
+    { date: "Sep 07", frp: 30.2 },
+    { date: "Sep 09", frp: 31.4 },
+    { date: "Sep 11", frp: 33.1 },
+    { date: "Sep 12", frp: 31.8 },
+    { date: "Sep 13", frp: 32.2 },
+    { date: "Sep 14", frp: 32.6 },
+  ],
+  "TH-005": [
+    { date: "Sep 05", frp: 6.1 },
+    { date: "Sep 08", frp: 7.2 },
+    { date: "Sep 10", frp: 8.4 },
+    { date: "Sep 12", frp: 9.1 },
+    { date: "Sep 14", frp: 9.8 },
+  ],
+  "TH-006": [
+    { date: "Sep 09", frp: 13.8 },
+    { date: "Sep 11", frp: 15.1 },
+    { date: "Sep 14", frp: 16.2 },
+  ],
+  "TH-007": [
+    { date: "Sep 12", frp: 21.6 },
+    { date: "Sep 14", frp: 23.1 },
+  ],
+  "TH-008": [
+    { date: "Sep 04", frp: 22.4 },
+    { date: "Sep 06", frp: 24.2 },
+    { date: "Sep 08", frp: 25.1 },
+    { date: "Sep 10", frp: 26.7 },
+    { date: "Sep 11", frp: 25.8 },
+    { date: "Sep 12", frp: 27.2 },
+    { date: "Sep 13", frp: 26.1 },
+    { date: "Sep 14", frp: 26.4 },
+  ],
+  "TH-009": [
+    { date: "Sep 08", frp: 10.4 },
+    { date: "Sep 11", frp: 11.9 },
+    { date: "Sep 13", frp: 12.8 },
+  ],
+  "TH-010": [
+    { date: "Sep 02", frp: 5.8 },
+    { date: "Sep 05", frp: 6.2 },
+    { date: "Sep 08", frp: 6.7 },
+    { date: "Sep 10", frp: 7.0 },
+    { date: "Sep 12", frp: 7.3 },
+    { date: "Sep 14", frp: 7.3 },
+  ],
+};
 
+const osmContext = {
+  "TH-001": {
+    nearestFeature: "Industrial Facility",
+    locality: "Vijayawada industrial corridor",
+    zoneType: "Industrial",
+    insideIndustrialZone: true,
+  },
+  "TH-002": {
+    nearestFeature: "Agricultural Land",
+    locality: "Sultan Bazar region",
+    zoneType: "Agricultural",
+    insideIndustrialZone: false,
+  },
+  "TH-003": {
+    nearestFeature: "Forest Area",
+    locality: "Bhubaneswar forest fringe",
+    zoneType: "Forest",
+    insideIndustrialZone: false,
+  },
+  "TH-004": {
+    nearestFeature: "Oil & Gas Facility",
+    locality: "Ahmedabad industrial region",
+    zoneType: "Industrial",
+    insideIndustrialZone: true,
+  },
+  "TH-005": {
+    nearestFeature: "Mining Area",
+    locality: "Bhopal mining region",
+    zoneType: "Mining",
+    insideIndustrialZone: false,
+  },
+  "TH-006": {
+    nearestFeature: "Agricultural Land",
+    locality: "Kurnool agricultural belt",
+    zoneType: "Agricultural",
+    insideIndustrialZone: false,
+  },
+  "TH-007": {
+    nearestFeature: "Industrial Facility",
+    locality: "Bengaluru industrial region",
+    zoneType: "Industrial",
+    insideIndustrialZone: true,
+  },
+  "TH-008": {
+    nearestFeature: "Oil & Gas Facility",
+    locality: "Mumbai industrial region",
+    zoneType: "Industrial",
+    insideIndustrialZone: true,
+  },
+  "TH-009": {
+    nearestFeature: "Forest Area",
+    locality: "Anantapur forest fringe",
+    zoneType: "Forest",
+    insideIndustrialZone: false,
+  },
+  "TH-010": {
+    nearestFeature: "Mining Area",
+    locality: "Pune mining region",
+    zoneType: "Mining",
+    insideIndustrialZone: false,
+  },
+};
+
+function getClassificationReason(detection) {
+  const reasons = {
+    "Industrial Fire":
+      "Industrial land-use match + elevated FRP + built-up surroundings",
+    "Agricultural Fire":
+      "Agricultural land-use match + low-to-moderate FRP + short detection history",
+    Wildfire:
+      "Forest proximity + vegetation signature + repeated thermal detections",
+    "Gas Flare":
+      "Oil and gas facility match + high FRP + fixed-location persistence",
+    "Mining Activity":
+      "Mining-area match + barren land signature + recurring low-to-moderate FRP",
+  };
+
+  return (
+    reasons[detection.classification] ||
+    "Multi-source thermal and spatial analysis"
+  );
+}
 const categories = [
   { name: "Industrial Fire", color: "#e07a3f" },
   { name: "Agricultural Fire", color: "#d8a63a" },
@@ -277,7 +423,131 @@ function DetailRow({ label, value }) {
     </div>
   );
 }
+function PersistenceTimeline({ detection }) {
+  const history = persistenceHistory[detection.id] || [];
+  const maxFRP = Math.max(...history.map((item) => item.frp), 1);
 
+  return (
+    <div className="details enhanced-details">
+      <div className="section-heading-row">
+        <div>
+          <h4>PERSISTENCE TIMELINE</h4>
+          <p className="section-caption">
+            {detection.persistence} detection
+            {detection.persistence === 1 ? "" : "s"} across the observation
+            period
+          </p>
+        </div>
+
+        <span
+          className={`persistence-status ${
+            detection.persistence >= 4 ? "recurring" : "limited"
+          }`}
+        >
+          {detection.persistence >= 4 ? "Recurring" : "Limited"}
+        </span>
+      </div>
+
+      <div className="persistence-chart">
+        {history.map((item) => (
+          <div
+            className="persistence-point"
+            key={`${detection.id}-${item.date}`}
+          >
+            <div className="persistence-bar-wrapper">
+              <div
+                className="persistence-bar"
+                style={{
+                  height: `${Math.max((item.frp / maxFRP) * 100, 18)}%`,
+                }}
+                title={`${item.date}: ${item.frp} MW FRP`}
+              />
+            </div>
+
+            <span>{item.date}</span>
+          </div>
+        ))}
+      </div>
+
+      <p className="timeline-note">
+        FRP by detection:{" "}
+        {history.map((item) => `${item.date} (${item.frp} MW)`).join(" · ")}
+      </p>
+    </div>
+  );
+}
+
+function ClassificationEvidence({ detection }) {
+  return (
+    <div className="classification-evidence">
+      <div className="evidence-icon">✦</div>
+
+      <div>
+        <span>WHY THIS CLASSIFICATION?</span>
+        <p>{getClassificationReason(detection)}</p>
+      </div>
+    </div>
+  );
+}
+
+function OSMContext({ detection }) {
+  const context = osmContext[detection.id];
+
+  if (!context) return null;
+
+  return (
+    <div className="details osm-details">
+      <div className="section-heading-row">
+        <div>
+          <h4>OPENSTREETMAP CONTEXT</h4>
+          <p className="section-caption">Land-use and nearby feature context</p>
+        </div>
+
+        <span className="osm-badge">OSM</span>
+      </div>
+
+      <DetailRow
+        label="Nearest tagged feature"
+        value={context.nearestFeature}
+      />
+      <DetailRow label="Locality" value={context.locality} />
+      <DetailRow label="Land-use zone" value={context.zoneType} />
+
+      <DetailRow
+        label="Inside industrial zone"
+        value={context.insideIndustrialZone ? "Yes" : "No"}
+      />
+    </div>
+  );
+}
+
+function SeverityLegend() {
+  return (
+    <div className="severity-legend">
+      <strong>SEVERITY</strong>
+
+      <span>
+        <i className="severity-dot low" />
+        Low — monitor
+      </span>
+
+      <span>
+        <i className="severity-dot medium" />
+        Medium — review
+      </span>
+
+      <span>
+        <i className="severity-dot high" />
+        High — priority
+      </span>
+
+      <span>
+        <i className="severity-dot critical" />
+        Critical — urgent
+      </span>
+    </div>
+  );
+}
 /* =========================================================
    APP
 ========================================================= */
@@ -794,18 +1064,23 @@ export default function App() {
                         }}
                       >
                         <Popup>
-                          <div className="popup">
-                            <strong>{item.classification}</strong>
+                          <div className="popup popup-compact">
+                            <span className="popup-eyebrow">{item.id}</span>
 
-                            <span>{item.id}</span>
+                            <strong>{item.classification}</strong>
 
                             <p>{item.location}</p>
 
-                            <p>FRP: {item.frp} MW</p>
+                            <div className="popup-footer">
+                              <RiskBadge risk={item.risk} />
 
-                            <p>Persistence: {item.persistence}</p>
-
-                            <p>Confidence: {item.confidence}%</p>
+                              <button
+                                type="button"
+                                onClick={() => setSelectedDetection(item)}
+                              >
+                                View details →
+                              </button>
+                            </div>
                           </div>
                         </Popup>
                       </CircleMarker>
@@ -831,7 +1106,7 @@ export default function App() {
                       </span>
                     ))}
                   </div>
-
+                  <SeverityLegend />
                   {filteredDetections.length === 0 && (
                     <div className="no-results">
                       <div className="target">
@@ -877,14 +1152,24 @@ export default function App() {
                       <div className="inspection-title">
                         <span>SELECTED DETECTION</span>
 
-                        <h2>{selectedDetection.classification}</h2>
-
-                        <div>
-                          <strong>{selectedDetection.id}</strong>
+                        <div className="inspection-heading-row">
+                          <div>
+                            <h2>{selectedDetection.classification}</h2>
+                            <p>{selectedDetection.location}</p>
+                          </div>
 
                           <RiskBadge risk={selectedDetection.risk} />
                         </div>
+
+                        <div className="inspection-meta">
+                          <strong>{selectedDetection.id}</strong>
+                          <span>
+                            {selectedDetection.confidence}% model confidence
+                          </span>
+                        </div>
                       </div>
+
+                      <ClassificationEvidence detection={selectedDetection} />
 
                       <div className="details">
                         <h4>OBSERVATION</h4>
@@ -930,7 +1215,7 @@ export default function App() {
 
                         <DetailRow
                           label="Persistence"
-                          value={selectedDetection.persistence}
+                          value={`${selectedDetection.persistence} observations`}
                         />
 
                         <DetailRow
@@ -938,7 +1223,8 @@ export default function App() {
                           value={`${selectedDetection.confidence}%`}
                         />
                       </div>
-
+                      <PersistenceTimeline detection={selectedDetection} />
+                      <OSMContext detection={selectedDetection} />
                       <div className="details">
                         <h4>SPATIAL CONTEXT</h4>
 
