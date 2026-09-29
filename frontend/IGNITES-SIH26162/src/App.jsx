@@ -480,8 +480,6 @@ function PersistenceTimeline({ detection }) {
 function ClassificationEvidence({ detection }) {
   return (
     <div className="classification-evidence">
-      <div className="evidence-icon">✦</div>
-
       <div>
         <span>WHY THIS CLASSIFICATION?</span>
         <p>{getClassificationReason(detection)}</p>
