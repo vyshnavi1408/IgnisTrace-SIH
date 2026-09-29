@@ -1621,40 +1621,33 @@ footer {
 }
 
 .classification-evidence {
-  display: flex;
-  gap: 10px;
   margin: 18px 0;
   padding: 13px;
-  border: 1px solid #f1dfbd;
-  border-left: 3px solid #d8a63a;
-  border-radius: 8px;
-  background: #fffbf3;
-}
 
-.evidence-icon {
-  display: grid;
-  flex: 0 0 23px;
-  width: 23px;
-  height: 23px;
-  place-items: center;
-  border-radius: 50%;
-  color: #916d16;
-  background: #f8e9bd;
-  font-size: 0.75rem;
+  background: #0e191f;
+
+  border: 1px solid #1f2f36;
+  border-left: 3px solid #d66936;
+  border-radius: 4px;
 }
 
 .classification-evidence span,
 .section-heading-row h4 {
   display: block;
-  color: #8c6d2e;
+
+  color: #b8613a;
+
   font-size: 0.64rem;
   font-weight: 800;
+
   letter-spacing: 0.09em;
 }
 
 .classification-evidence p {
-  margin: 5px 0 0;
-  color: #5f5b4e;
+  margin: 6px 0 0;
+
+  color: #9eafb6;
+
   font-size: 0.76rem;
   line-height: 1.45;
 }
