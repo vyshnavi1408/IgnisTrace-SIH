@@ -653,14 +653,22 @@ export default function App() {
 
         <nav>
           {pages.map(([id, number, label]) => (
-            <button
-              key={id}
-              className={page === id ? "active" : ""}
-              onClick={() => setPage(id)}
-            >
-              <span>{number}</span>
-              {label}
-            </button>
+           <button
+  type="button"
+  onClick={(event) => {
+    event.stopPropagation();
+    setSelectedDetection(item);
+
+    setTimeout(() => {
+      document.querySelector(".inspector")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 100);
+  }}
+>
+  View details →
+</button>
           ))}
         </nav>
 
